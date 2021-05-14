@@ -1,0 +1,17 @@
+[package]
+name = "openbot-rs"
+version = "0.1.0"
+authors = ["James Pogue <jamesipogue@protonmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.40"
+futures = "0.3.15"
+# sqlx = { version = "0.5.2", features = [ "runtime-tokio-rustls" ] }
+itertools = "0.10.0"
+serenity = "0.10.5"
+tokio = { version = "1.5.0", features = ["full"] }
+serde_json = "1.0.64"
+serde = "1.0.126"
