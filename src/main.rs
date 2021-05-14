@@ -16,13 +16,7 @@ use serenity::{
     prelude::*,
     Client,
 };
-use std::{
-    collections::{BTreeMap, HashMap, VecDeque},
-    path::Path,
-    sync::Arc,
-    thread::{sleep_ms, JoinHandle},
-    time::Duration,
-};
+use std::{collections::{BTreeMap, HashMap, VecDeque}, env, path::Path, sync::Arc, thread::{sleep_ms, JoinHandle}, time::Duration};
 
 use anyhow::Context as Ctx;
 use anyhow::Result;
@@ -31,8 +25,6 @@ mod commands;
 
 use commands::{dailyrep::*, rust::*};
 use tokio::fs;
-
-static TOKEN: &str = "ODQyMDQxNTY4MTE0NTA3Nzg2.YJviUg.KUdeC32DDvMzw2yURm0ER4GQoFg";
 
 struct Handler;
 
@@ -138,14 +130,14 @@ impl TypeMapKey for UserData {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let builder = Client::builder(TOKEN)
+    let builder = Client::builder(env::var("OPENBOT_TOKEN")?)
         .type_map_insert::<UserData>(if Path::new("user_data.json").exists() {
             serde_json::from_str(
                 &fs::read_to_string("user_data.json")
                     .await
-                    .expect("Could not find user data"),
+                    .context("Could not find user data")?,
             )
-            .expect("Could not parse user data")
+            .context("Could not parse user data")?
         } else {
             println!("user_data.json missing.... making a new one");
             UserData::new()
@@ -157,9 +149,7 @@ async fn main() -> Result<()> {
                 .group(&GENERAL_GROUP),
         );
 
-    let client = tokio::spawn(async { builder.await.unwrap().start().await.unwrap() });
-
-    client.await?;
+    builder.await?.start().await?;
 
     Ok(())
 }
